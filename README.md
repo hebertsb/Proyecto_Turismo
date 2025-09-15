@@ -1,157 +1,137 @@
-# Proyecto_Turismo
+Condominio Inteligente – Primer Parcial
 1. Introducción
-El proyecto es una plataforma de software web y móvil para turismo, diseñada para Bolivia. Permite a los usuarios:
-- Reservar tours y otros servicios turísticos.
-- Pagar online de manera segura.
-- Consultar y recibir recomendaciones inteligentes.
-- Permite a los operadores y administradores gestionar servicios, reservas y reportes.
 
-Está construido con Django (backend), SQLite (base de datos) y React/Flutter (frontend).
+Este proyecto es una plataforma de gestión de condominios con inteligencia artificial, accesible tanto desde web como desde dispositivos móviles.
+Su objetivo principal es optimizar la administración y la experiencia de los residentes mediante automatización y análisis inteligente de datos.
+Funciones principales para los usuarios:
+Reservar y gestionar áreas comunes (salones, parqueos, canchas, etc.).
+Pagar cuotas y servicios en línea de manera segura.
+Recibir notificaciones inteligentes (recordatorios de pagos, alertas de seguridad, avisos del condominio).
+Asistencia virtual con IA para consultas frecuentes de residentes.
+Funciones para administradores:
+Gestión de residentes y personal (roles, accesos y permisos).
+Control de pagos, reportes y balances.
+Supervisión de reservas y mantenimiento preventivo.
+Panel con analítica predictiva (detección de morosidad, consumo de servicios, optimización de recursos).
+Tecnologías utilizadas:
 
----
+Backend: Django
+Base de Datos: SQLite
+Frontend Web/Móvil: React / Flutter
+IA: Modelos integrados para recomendaciones y análisis predictivo.
 
 2. Estructura General del Proyecto
+2.1 Carpeta sitio/
 
-El proyecto está organizado en varias carpetas y aplicaciones:
+Configuración global de Django.
 
-2.1 Carpeta 'sitio/':
-- Contiene la configuración global de Django.
-- Archivos clave:
-    - settings.py: Configuración de la base de datos, apps instaladas, middleware, autenticación, etc.
-    - urls.py: Rutas principales del proyecto.
-    - wsgi.py: Configuración para producción (WSGI server).
-    
-2.2 Apps principales (cada carpeta representa un módulo funcional):
+Archivos clave:
 
-- accounts/: Gestión de usuarios, roles, permisos y autenticación.
-- bookings/: Gestión de reservas, pagos y estados de reservas.
-- payments/: Procesamiento de pagos y cupones.
-- sales/: Cotizaciones y ventas realizadas por agentes.
-- operators/: Gestión de operadores (guías, conductores, proveedores).
-- reviews/: Gestión de reseñas de tours o servicios.
-- cms/: Sistema de contenido administrativo.
-- core/: Contiene entidades centrales como Tour y Departure.
+settings.py: Configuración de base de datos, apps, middleware y autenticación.
+urls.py: Rutas principales del proyecto.
+wsgi.py: Configuración para despliegue en producción.
 
-2.3 Carpeta packages/:
-- Contiene código reutilizable y casos de uso (use_cases) para organizar la lógica de negocio.
-- Subcarpetas típicas:
-    - reservas_pagos/: Casos de uso y API de reservas y pagos.
-    - ventas_cotizaciones/: Casos de uso y API de cotizaciones.
-    - operadores_servicios/: Casos de uso y API para operadores.
-    - admin_config/: Configuraciones globales y administración.
+2.2 Apps principales
 
----
+accounts/: Gestión de usuarios, roles, accesos y autenticación.
+reservas/: Reservas de áreas comunes y control de disponibilidad.
+pagos/: Procesamiento de pagos de cuotas, mantenimiento y servicios.
+reportes/: Generación de reportes administrativos y financieros.
+personal/: Administración de personal de seguridad, limpieza y mantenimiento.
+notificaciones/: Sistema de alertas, recordatorios y comunicados.
+ia/: Módulo de inteligencia artificial para predicciones y asistencia virtual.
+core/: Entidades centrales como Condominio, UnidadHabitacional, Residentes.
+
+2.3 Carpeta packages/
+
+Código reutilizable y casos de uso.
+
+Ejemplos:
+
+reservas_pagos/: Gestión integrada de reservas con pagos.
+analitica/: Modelos predictivos para consumos y morosidad.
+mantenimiento/: Lógica para control de mantenimientos programados.
 
 3. Modelos y Base de Datos
 
-Cada app tiene un archivo models.py que define los modelos:
-- Booking: Tabla de reservas (usuario, tour, fecha de salida, cantidad de personas, estado, pago).
-- Tour: Tabla de tours (nombre, precio, descripción).
-- Departure: Tabla de salidas de cada tour (fecha y detalles).
-- User: Tabla de usuarios extendida desde el modelo de Django.
+Algunos modelos principales:
 
-El ORM de Django se encarga de transformar estos modelos en **tablas en la base de datos SQLite**.
-
----
+UnidadHabitacional: Representa cada departamento o casa.
+Residente: Información del propietario o inquilino.
+Reserva: Gestión de áreas comunes (fecha, estado, usuario).
+Pago: Registro de cuotas, servicios y estado de pago.
+Notificación: Avisos enviados al residente.
+El ORM de Django transforma estos modelos en tablas en SQLite.
 
 4. Serializadores (serializers.py)
 
-- Los serializadores transforman datos de los modelos de Django a JSON y viceversa.
-- Ejemplo: BookingSerializer convierte objetos Booking para que puedan enviarse/recibirse por la API.
-
----
+Transforman datos entre modelos Django y JSON.
+Ejemplo: ReservaSerializer convierte los datos de una reserva en JSON para la API.
 
 5. Vistas y ViewSets (views.py / viewsets.py)
 
-- ViewSets permiten crear endpoints CRUD automáticamente (Crear, Leer, Actualizar, Eliminar).
-- Cada módulo tiene su ViewSet:
-    - BookingViewSet: Gestiona reservas y aplica permisos (solo usuario dueño o admin puede ver todas).
-- Las vistas manejan las solicitudes HTTP (GET, POST, PUT, DELETE).
+Cada módulo tiene su ViewSet CRUD:
 
----
+ReservaViewSet: Crear, leer, actualizar y cancelar reservas.
+PagoViewSet: Procesar pagos y consultar estados.
+Permisos integrados para garantizar seguridad según el rol del usuario.
 
 6. Rutas y URLs (urls.py)
 
-- Cada app define sus rutas internas en urls.py.
-- En sitio/urls.py se incluyen todas las rutas de los módulos usando include().
-- Ejemplo: /api/booking/bookings/ apunta al BookingViewSet.
-
----
+Cada app define sus rutas internas.
+En sitio/urls.py se integran todas.
+Ejemplo: /api/reservas/ apunta al ReservaViewSet.
 
 7. Permisos y Roles
 
-- Se usan grupos de Django para definir roles:
-    - ADMINISTRADOR: Acceso total a todas las apps.
-    - AGENTE_VENTAS: Gestiona cotizaciones y reservas propias.
-    - OPERADOR: Ve sus asignaciones y actualiza estado de servicios.
-    - CONTADOR: Consulta pagos y reportes.
-- Los permisos se aplican en ViewSets con clases personalizadas.
-
----
+ADMINISTRADOR: Acceso total.
+COPROPIETARIO: Puede gestionar su unidad, pagos y reservas.
+SERVICIOS: Solo accede a sus tareas asignadas.
+PERSONAL: Consulta reportes financieros y pagos.
 
 8. CRUD de Reservas
 
-1. Crear reserva: POST /api/booking/bookings/
-2. Leer reservas: GET /api/booking/bookings/ (usuario ve las suyas, admin todas)
-3. Actualizar reserva: PUT/PATCH /api/booking/bookings/{id}/
-4. Eliminar reserva: DELETE /api/booking/bookings/{id}/
-
-- El serializer convierte los datos JSON a modelo Booking.
-- El ViewSet controla la lógica y los permisos.
-- La tabla Booking se almacena en SQLite.
-
----
+Crear: POST /api/reservas/
+Leer: GET /api/reservas/
+Actualizar: PUT/PATCH /api/reservas/{id}/
+Eliminar: DELETE /api/reservas/{id}/
 
 9. Testing y API
 
-- Se puede probar la API desde:
-    - Interfaz web de Django REST Framework.
-    - Postman usando sesión (login) o JWT (token Bearer).
+Pruebas con:
+Django REST Framework
+Postman
+JWT para autenticación de usuarios.
+Ejemplo JSON de reserva:
 
-- JWT:
-    1. POST /api/auth/token/ con username/password.
-    2. Usar access token en encabezado Authorization: Bearer <token> para acceder a la API.
-
-- Ejemplo JSON para crear reserva:
 {
-  "tour": 1,
-  "salida": 1,
-  "personas": 2,
-  "importe_centavos": 500000,
-  "moneda": "usd"
+  "area": 1,
+  "fecha": "2025-09-15",
+  "hora_inicio": "18:00",
+  "hora_fin": "20:00",
+  "residente": 3
 }
 
----
+10. Carpetas Especiales
 
-10. Carpetas especiales
+common/: Código compartido.
+use_cases/: Casos de negocio específicos (ej. predicción de pagos atrasados).
+api/: Endpoints expuestos para cada módulo.
 
-- common/: Código y utilidades compartidas entre módulos.
-- use_cases/: Lógica de negocio específica, por ejemplo:
-    - Crear reserva con validaciones.
-    - Procesar pagos.
-    - Generar cotizaciones.
+11. Flujo General del Sistema
 
-- api/: Endpoints para exponer la funcionalidad de cada módulo.
-
----
-
-11. Flujo General
-
-1. El usuario inicia sesión o se registra.
-2. Consulta tours disponibles y selecciona uno.
-3. Crea la reserva y realiza el pago.
-4. El operador recibe la asignación y actualiza estado.
-5. Los administradores y contadores pueden consultar reportes y métricas.
-
----
+Residente inicia sesión.
+Consulta su estado de cuenta y reserva áreas comunes.
+Realiza pago online.
+El sistema con IA sugiere recordatorios y predicciones.
+Administradores consultan reportes y métricas.
 
 12. Resumen
 
-- models.py → define tablas.
-- serializers.py → convierte datos a JSON.
-- views.py / viewsets.py → controla lógica CRUD y permisos.
-- urls.py → rutas de la API.
-- admin.py → gestión en el panel de Django.
-- packages/use_cases → lógica de negocio central.
-- SQLite → almacena los datos.
-- Postman o frontend → consumen la API.
+models.py → define las tablas.
+serializers.py → transforma a JSON.
+views.py / viewsets.py → CRUD y permisos.
+urls.py → rutas API.
+ia/ → lógica de inteligencia artificial.
+SQLite → base de datos.
+Postman o frontend → consumen la API.
